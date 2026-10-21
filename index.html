@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindMetrics – Mental Health Score Predictor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#2b7de9" />
+            <stop offset="1" stop-color="#14b8a6" />
+          </linearGradient>
+        </defs>
+        <circle cx="24" cy="24" r="22" fill="url(#lg)" />
+        <path d="M10 25h7l3-8 5 15 4-11 2 4h7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <div>
+        <h1>MindMetrics</h1>
+        <p class="tagline">Machine Learning Mental Health Score Predictor</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="intro">
+      <h2>Estimate a mental health score from daily habits</h2>
+      <p>
+        Enter a student's profile, social media usage, and lifestyle details. The information is sent to a
+        machine learning model running on your FastAPI backend, which returns a predicted mental health score.
+      </p>
+    </section>
+
+    <div class="layout">
+      <section class="card form-card" aria-labelledby="form-title">
+        <h2 id="form-title">Student Information</h2>
+
+        <div id="error-box" class="alert alert-error" role="alert" hidden>
+          <strong id="error-title">Something went wrong</strong>
+          <ul id="error-list"></ul>
+        </div>
+
+        <form id="prediction-form" novalidate>
+          <fieldset>
+            <legend>Profile</legend>
+            <div class="grid">
+              <div class="field">
+                <label for="age">Age <span class="unit">(years)</span></label>
+                <input type="number" id="age" name="age" min="10" max="100" step="1" placeholder="e.g. 21" required />
+                <small class="hint">Between 10 and 100</small>
+                <span class="field-error" id="age-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required>
+                  <option value="" selected disabled>Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+                <span class="field-error" id="gender-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" list="country-list" placeholder="e.g. India" autocomplete="off" required />
+                <datalist id="country-list">
+                  <option value="India"></option>
+                  <option value="USA"></option>
+                  <option value="Canada"></option>
+                  <option value="Australia"></option>
+                  <option value="UK"></option>
+                  <option value="Germany"></option>
+                  <option value="Mexico"></option>
+                  <option value="Turkey"></option>
+                  <option value="France"></option>
+                  <option value="Pakistan"></option>
+                  <option value="Bangladesh"></option>
+                  <option value="Brazil"></option>
+                  <option value="Japan"></option>
+                  <option value="South Korea"></option>
+                  <option value="China"></option>
+                  <option value="Russia"></option>
+                  <option value="Italy"></option>
+                  <option value="Spain"></option>
+                </datalist>
+                <small class="hint">Pick a suggestion or type your own</small>
+                <span class="field-error" id="country-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="academic_level">Academic Level</label>
+                <select id="academic_level" name="academic_level" required>
+                  <option value="" selected disabled>Select level</option>
+                  <option value="Undergraduate">Undergraduate</option>
+                  <option value="Graduate">Graduate</option>
+                  <option value="High School">High School</option>
+                </select>
+                <span class="field-error" id="academic_level-error" aria-live="polite"></span>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Social Media Usage</legend>
+            <div class="grid">
+              <div class="field">
+                <label for="most_used_platform">Most Used Platform</label>
+                <select id="most_used_platform" name="most_used_platform" required>
+                  <option value="" selected disabled>Select platform</option>
+                  <option value="Facebook">Facebook</option>
+                  <option value="LinkedIn">LinkedIn</option>
+                  <option value="Instagram">Instagram</option>
+                  <option value="Snapchat">Snapchat</option>
+                  <option value="Twitter">Twitter</option>
+                  <option value="YouTube">YouTube</option>
+                  <option value="TikTok">TikTok</option>
+                  <option value="LINE">LINE</option>
+                  <option value="KakaoTalk">KakaoTalk</option>
+                  <option value="VKontakte">VKontakte</option>
+                  <option value="WhatsApp">WhatsApp</option>
+                  <option value="WeChat">WeChat</option>
+                </select>
+                <span class="field-error" id="most_used_platform-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="purpose_of_use">Purpose of Use</label>
+                <select id="purpose_of_use" name="purpose_of_use" required>
+                  <option value="" selected disabled>Select purpose</option>
+                  <option value="Networking">Networking</option>
+                  <option value="Education">Education</option>
+                  <option value="Entertainment">Entertainment</option>
+                  <option value="News">News</option>
+                </select>
+                <span class="field-error" id="purpose_of_use-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="avg_daily_usage_hours">Avg. Daily Usage <span class="unit">(hours)</span></label>
+                <input type="number" id="avg_daily_usage_hours" name="avg_daily_usage_hours" min="0" max="24" step="any" placeholder="e.g. 4.5" required />
+                <small class="hint">0 – 24 hours</small>
+                <span class="field-error" id="avg_daily_usage_hours-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="daily_unlocks">Daily Phone Unlocks <span class="unit">(times)</span></label>
+                <input type="number" id="daily_unlocks" name="daily_unlocks" min="0" step="1" placeholder="e.g. 60" required />
+                <small class="hint">Whole number, 0 or more</small>
+                <span class="field-error" id="daily_unlocks-error" aria-live="polite"></span>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Lifestyle</legend>
+            <div class="grid">
+              <div class="field">
+                <label for="study_hours">Study Hours <span class="unit">(per day)</span></label>
+                <input type="number" id="study_hours" name="study_hours" min="0" max="24" step="any" placeholder="e.g. 3" required />
+                <small class="hint">0 – 24 hours</small>
+                <span class="field-error" id="study_hours-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="physical_activity_hours">Physical Activity <span class="unit">(per day)</span></label>
+                <input type="number" id="physical_activity_hours" name="physical_activity_hours" min="0" max="24" step="any" placeholder="e.g. 1" required />
+                <small class="hint">0 – 24 hours</small>
+                <span class="field-error" id="physical_activity_hours-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="sleep_hours_per_night">Sleep <span class="unit">(hours per night)</span></label>
+                <input type="number" id="sleep_hours_per_night" name="sleep_hours_per_night" min="0" max="24" step="any" placeholder="e.g. 7" required />
+                <small class="hint">0 – 24 hours</small>
+                <span class="field-error" id="sleep_hours_per_night-error" aria-live="polite"></span>
+              </div>
+
+              <div class="field">
+                <label for="stress_level">Stress Level</label>
+                <select id="stress_level" name="stress_level" required>
+                  <option value="" selected disabled>Select stress level</option>
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Very High">Very High</option>
+                </select>
+                <span class="field-error" id="stress_level-error" aria-live="polite"></span>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button type="submit" id="submit-btn" class="btn btn-primary">
+              <span class="btn-spinner" aria-hidden="true"></span>
+              <span id="submit-label">Predict Mental Health Score</span>
+            </button>
+            <button type="button" id="reset-btn" class="btn btn-secondary">Reset Form</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="side">
+        <section id="loading-panel" class="card loading-card" role="status" aria-live="polite" hidden>
+          <div class="spinner" aria-hidden="true"></div>
+          <p>Analyzing your information...</p>
+        </section>
+
+        <section id="result-panel" class="card result-card" aria-live="polite" hidden>
+          <h2>Your Prediction Result</h2>
+          <div class="gauge-wrap">
+            <svg class="gauge" viewBox="0 0 120 120" aria-hidden="true">
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#2b7de9" />
+                  <stop offset="1" stop-color="#14b8a6" />
+                </linearGradient>
+              </defs>
+              <circle class="gauge-track" cx="60" cy="60" r="52" />
+              <circle class="gauge-fill" id="gauge-fill" cx="60" cy="60" r="52" />
+            </svg>
+            <div class="gauge-text">
+              <span id="score-value" class="score-value">–</span>
+              <span class="score-label">Predicted Mental Health Score</span>
+            </div>
+          </div>
+          <p class="result-note">
+            This is the raw value returned by the model. The scoring scale is not defined by the backend,
+            so no category or clinical meaning is assigned. The gauge is only a visual aid on a 0–10 display range.
+          </p>
+          <button type="button" id="new-prediction-btn" class="btn btn-secondary">Start New Prediction</button>
+        </section>
+
+        <section id="placeholder-panel" class="card placeholder-card">
+          <h3>Your result will appear here</h3>
+          <p>Fill in the form and press <em>Predict Mental Health Score</em>.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>
+        <strong>Disclaimer:</strong> This tool is for informational and educational purposes only. It is not a
+        medical or psychological assessment and does not replace advice from a qualified professional.
+      </p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
