@@ -1,0 +1,5 @@
+uvicorn main:app --reload (Backend on this port)
+uvicorn main:app --port 8000 --reload
+python -m http.server 5500 (in new terminal) (Frontend on this port)
+
+http://127.0.0.1:5500/
